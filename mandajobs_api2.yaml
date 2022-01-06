@@ -1,0 +1,853 @@
+swagger: "2.0"
+info:
+  description: "API para serviço de contratação de profissionais autônomos (pf/pj) por clientes (pf/pj) a fim de facilitar contratação de serviços diversos"
+  version: "1.0.0"
+  title: "Swagger API - Manda Jobs"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "annyufrr@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "mandajobs.swagger.io"
+basePath: "/api/v1"
+tags:
+- name: "user"
+  description: "Funções para usuário"
+- name: "outfitter"
+  description: "Funções para prestadores"
+- name: "reserve"
+  description: "Funções para reservas/pedidos"
+- name: "category"
+  description: "Categoria de serviços"
+- name: "service"
+  description: "Funções para Serviços"
+- name: "chat"
+  description: "Funções para chat"
+- name: "pay"
+  description: "Funções de pagamentos"
+- name: "withdraw"
+  description: "Funções de saque"
+- name: "balance"
+  description: "Funções de saldo"
+schemes:
+- "https"
+paths:
+  /user/register:
+    post:
+      tags:
+      - "user"
+      summary: "Criar user"
+      description: "Esse endpoint consulta endpoint do governo para checar se cpf/cnpj está em dia e se possui pendência com a justiça."
+      operationId: "createUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+  /user/login:
+    post:
+      tags:
+      - "user"
+      summary: "Loga o usuário no sistema"
+      description: "Retorna token JWT e token Firebase para notificações e chat"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/Login"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+  /user/logout:
+    get:
+      tags:
+      - "user"
+      security:
+        - Bearer: []
+      summary: "Loga usuário que enviou o token no header"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+  /user/{email}:
+    get:
+      tags:
+      - "user"
+      summary: "Pega usuario por email"
+      description: "Isso só pode ser feito por usuário logado"
+      operationId: "getUserByName"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "email"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    put:
+      tags:
+      - "user"
+      summary: "Atualiza usuário"
+      description: "Isso só pode ser feito por usuário logado"
+      operationId: "updateUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "email"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    delete:
+      tags:
+      - "user"
+      summary: "Deletar usuário"
+      description: "Isso só pode ser feito por usuário logado"
+      operationId: "deleteUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "email"
+        in: "path"
+        description: "The name that needs to be deleted"
+        required: true
+        type: "string"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+  /category:
+    post:
+      tags:
+      - "category"
+      summary: "Criar categoria"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Objeto de categoria a ser criada"
+        required: true
+        schema:
+          $ref: "#/definitions/Category"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    get:
+      tags:
+      - "category"
+      summary: "Pega lista de categorias"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+  /category/{category_id}:
+    get:
+      tags:
+      - "category"
+      summary: "Pegar categoria por id"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "category_id"
+        in: "path"
+        type: "string"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    put:
+      tags:
+      - "category"
+      summary: "Atualizar categoria"
+      description: "Isso só pode ser feito por usuário ADMIN"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "category_id"
+        in: "path"
+        type: "string"
+        required: true
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Category"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    delete:
+      tags:
+      - "category"
+      summary: "Excluir categoria"
+      description: "Isso só pode ser feito por usuário ADMIN"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "category_id"
+        in: "path"
+        type: "string"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+  /outfitter/service:
+    get:
+      tags:
+      - "outfitter"
+      summary: "Encontrar prestador(es) associado(s) que tenham serviço da categoria ou categoria(s) associado(s) a prestador por status ou não ou pegar tudo (só não enviar enhum parametro)"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "status"
+        in: "query"
+        type: "string"
+      - name: "outffiter_id"
+        in: "query"
+        type: "string"
+      - name: "category_id"
+        in: "query"
+        type: "string"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    post:
+      tags:
+      - "outfitter"
+      summary: "Prestador X pode se cadastrar em categoria Y, isso gera um serviço"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Service"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+  /outfitter/service/{service_id}:
+    put:
+      tags:
+      - "outfitter"
+      summary: "Prestador X pode atualizar seu serviço"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "service_id"
+        in: "path"
+        type: "string"
+        required: true
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Service"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    delete:
+      tags:
+      - "outfitter"
+      summary: "Prestador X pode desativar seu serviço"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "service_id"
+        in: "path"
+        type: "string"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+  /reserve:
+    post:
+      tags:
+      - "reserve"
+      summary: "Criar uma reserva"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/Reserve"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    get:
+      tags:
+      - "reserve"
+      summary: "Pegar lista de reserva"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "status"
+        in: "query"
+        type: "string"
+      - name: "outffiter_id"
+        in: "query"
+        type: "string"
+      - name: "category_id"
+        in: "query"
+        type: "string"
+      - name: "service_id"
+        in: "query"
+        type: "string"
+      - name: "client_id"
+        in: "query"
+        type: "string"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+  /reserve/{reserve_id}:
+    get:
+      tags:
+      - "reserve"
+      summary: "Pegar uma reserva por id"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "reserve_id"
+        in: "path"
+        type: "integer"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/Reserve"
+      security:
+        - Bearer: []
+  /reserve/{reserve_id}/accept:
+    put:
+      tags:
+      - "reserve"
+      summary: "Aceitar uma reserva"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "reserve_id"
+        in: "path"
+        type: "integer"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/Reserve"
+      security:
+        - Bearer: []
+  /reserve/{reserve_id}/reject:
+    put:
+      tags:
+      - "reserve"
+      summary: "Rejeitar uma reserva"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "reserve_id"
+        in: "path"
+        type: "integer"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/Reserve"
+      security:
+        - Bearer: []
+  /reserve/{reserve_id}/complete/{code}:
+    put:
+      tags:
+      - "reserve"
+      summary: "Completar uma reserva"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "reserve_id"
+        in: "path"
+        type: "integer"
+        required: true
+      - name: "code"
+        in: "path"
+        type: "string"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/Reserve"
+      security:
+        - Bearer: []
+  /reserve/{reserve_id}/executing:
+    put:
+      tags:
+      - "reserve"
+      summary: "Sinalizar serviço em execução"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "reserve_id"
+        in: "path"
+        type: "integer"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/Reserve"
+      security:
+        - Bearer: []
+  /reserve/{reserve_id}/cancel:
+    put:
+      tags:
+      - "reserve"
+      summary: "Cancelar uma reserva"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "reserve_id"
+        in: "path"
+        type: "integer"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/Reserve"
+      security:
+        - Bearer: []
+  /reserve/{reserve_id}/code:
+    get:
+      tags:
+      - "reserve"
+      summary: "Gera código para o cliente para confirmação do prestador"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "reserve_id"
+        in: "path"
+        type: "integer"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/Reserve"
+      security:
+        - Bearer: []
+  /chat/{user_id}:
+    get:
+      tags:
+      - "chat"
+      summary: "Pega token firebase do usuário desejado para iniciar um chat entre o usuário requerente (por token jwt) com um usuário desejado"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "user_id"
+        in: "path"
+        type: "integer"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+  /service:
+    get:
+      tags:
+      - "service"
+      summary: "Pega lista de serviços por categoria ou geral"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "category_id"
+        in: "query"
+        type: "integer"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+  /service/{service_id}:
+    get:
+      tags:
+      - "service"
+      summary: "Pega serviço por id"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "service_id"
+        in: "path"
+        type: "string"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    put:
+      tags:
+      - "service"
+      summary: "Atualizar serviço por id"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "service_id"
+        in: "path"
+        type: "string"
+        required: true
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Service"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    delete:
+      tags:
+      - "service"
+      summary: "Desativar serviço por id"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "service_id"
+        in: "path"
+        type: "string"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+  /pay:
+    post:
+      tags:
+      - "pay"
+      summary: "Gera QR code para receber pagamento por pix para adicionar ao saldo de usuário"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/PixPayment"
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+    get:
+      tags:
+      - "pay"
+      summary: "Pega lista de pagamentos já realizados por usuário"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      responses:
+        default:
+          $ref: "#/definitions/PaymentHistory"
+      security:
+        - Bearer: []
+  /pay/{reserve_id}/{payment_type}:
+    post:
+      tags:
+      - "pay"
+      summary: "Pagar um serviço reservado com saldo ou por gateway"
+      description: "Isso só pode ser feito por usuário logado.\nEsse endpoint registra que um pagamento foi realizado (o pagamento é feito no frontend por gateway de pagamento GooglePay e nosso app só registra o pagamento no histórico, ou transfere dentro do nossa api do saldo do cliente para o saldo do prestador, depende do tipo de pagamento escolhido).\nO valor do serviço está associado ao reserve_id. O payment_type pode ser BALANCE (para pagamento por saldo) ou GATEWAY (para pagamento realizadopor gateway de pagamento GooglePay)"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "reserve_id"
+        in: "path"
+        type: "integer"
+        required: true
+      - name: "payment_type"
+        in: "path"
+        type: "string"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+  /balance:
+    get:
+      tags:
+      - "balance"
+      summary: "Pega saldo de usuário logado"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      responses:
+        default:
+          $ref: "#/definitions/Balance"
+      security:
+        - Bearer: []
+  /withdraw/{amount}:
+    get:
+      tags:
+      - "withdraw"
+      summary: "Transfere para conta do usuário ligado um pix com valor de seu saldo real"
+      description: "Isso só pode ser feito por usuário logado"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "amount"
+        in: "path"
+        type: "number"
+        required: true
+      responses:
+        default:
+          $ref: "#/definitions/ApiResponse"
+      security:
+        - Bearer: []
+securityDefinitions:
+  petstore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:pets: "modify pets in your account"
+      read:pets: "read your pets"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Category:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      title:
+        type: "string"
+      description:
+        type: "string"
+  Login:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      avatarUrl:
+        type: "string"
+      pixKey:
+        type: "string"
+      username:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+      phone:
+        type: "string"
+      cpfCnpj:
+        type: "string"
+      userType:
+        enum:
+        - "OUTFITTER"
+        - "CLIENT"
+        - "ADMIN"
+      userStatus:
+        enum:
+        - "ACTIVE"
+        - "INACTIVE"
+  Service:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      outfitterId:
+        type: "integer"
+      categoryId:
+        type: "integer"
+      title:
+        type: "string"
+      description:
+        type: "string"
+      price:
+        type: "number"
+      workTime:
+        type: "integer"
+      avatarUrl:
+        type: "string"
+  Reserve:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      serviceId:
+        type: "integer"
+      status:
+        enum:
+        - "WAITING"
+        - "REFUSED"
+        - "PENDING_PAY"
+        - "PENDING_ACT"
+        - "IN_EXECUTATION"
+        - "CANCELED"
+        - "COMPLETE"
+  Balance:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      userId:
+        type: "integer"
+      realBalance:
+        type: "number"
+      pendingBalance:
+        type: "number"
+      dateLastWithdraw:
+        type: "string"
+      dateLastUpdate:
+        type: "string"
+  WithdrawHistory:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      userId:
+        type: "integer"
+      amount:
+        type: "number"
+      datetime:
+        type: "string"
+  PaymentHistory:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      datetime:
+        type: "string"
+      outfitterId:
+        type: "integer"
+      clientId:
+        type: "integer"
+      reserveId:
+        type: "integer"
+      price:
+        type: "number"
+      paymentType:
+        enum:
+          - "balance"
+          - "gateway"
+  PixPayment:
+    type: "object"
+    properties:
+      amount:
+        type: "number"
+      datetime:
+        type: "string"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+components:
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+
